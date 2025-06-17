@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "zstd.h": "c",
+        "stdio.h": "c",
+        "zstd_seekable.h": "c",
+        "cerrno": "c",
+        "common.h": "c",
+        "stdlib.h": "c",
+        "time.h": "c",
+        "cstdlib": "c"
+    }
+}

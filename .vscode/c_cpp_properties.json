@@ -1,0 +1,23 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/external/zstd/lib",
+        "${workspaceFolder}/external/zstd/lib/common",
+        "${workspaceFolder}/external/zstd/contrib/seekable_format",
+        "/usr/lib/gcc/x86_64-linux-gnu/**/include",
+        "/usr/include/x86_64-linux-gnu",
+        "/usr/include",
+        "/usr/local/include"
+      ],
+      "defines": [],
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "c17",
+      "cppStandard": "gnu++17",
+      "intelliSenseMode": "linux-gcc-x64"
+    }
+  ],
+  "version": 4
+}
