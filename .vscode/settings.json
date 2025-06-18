@@ -7,6 +7,8 @@
         "common.h": "c",
         "stdlib.h": "c",
         "time.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "stdint-uintn.h": "c",
+        "random": "c"
     }
 }

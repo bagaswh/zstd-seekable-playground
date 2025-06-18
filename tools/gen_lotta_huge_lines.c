@@ -7,17 +7,51 @@
 
 #include "common.h"
 
-#define ASCII_MIN 32
-#define ASCII_MAX 126
+#define ASCII_MIN 65
+#define ASCII_MAX 90
 
-static char random_word()
+// static char random_word()
+// {
+//     int index = rand() % word_pool_size;
+//     return word_pool[index];
+// }
+
+char random_alphabetic_char(void)
 {
-    static const char word_pool[100] = {
-        
-    }
+    // int index = rand() % 26;
+    return 'A';
+}
 
-    int index = rand() % word_pool_size;
-    return word_pool[index];
+void reverse(char s[])
+{
+    int i, j;
+    char c;
+
+    for (i = 0, j = strlen(s) - 1; i < j; i++, j--)
+    {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
+}
+
+int itoa(int n, char s[])
+{
+    int i, sign;
+
+    if ((sign = n) < 0) /* record sign */
+        n = -n;         /* make n positive */
+    i = 0;
+    do
+    {                          /* generate digits in reverse order */
+        s[i++] = n % 10 + '0'; /* get next digit */
+    } while ((n /= 10) > 0); /* delete it */
+    if (sign < 0)
+        s[i++] = '-';
+    s[i] = '\0';
+    reverse(s);
+
+    return i;
 }
 
 int main(int argc, char **argv)
@@ -34,24 +68,29 @@ int main(int argc, char **argv)
     int num_lines = atoi(argv[2]);
     int line_size = atoi(argv[3]);
 
-    if (num_lines <= 0 || line_size <= 0) {
+    if (num_lines <= 0 || line_size <= 0)
+    {
         fprintf(stderr, "Both num_lines and line_size must be positive integers.\n");
         return EXIT_FAILURE;
     }
 
     struct timespec ts = {0};
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    srand(ts.tv_nsec ^ ts.tv_sec); // XOR for slightly more randomness
+    srand(ts.tv_nsec ^ ts.tv_sec);
 
     FILE *out = fopen_orDie(filename, "w");
 
-    char *line = malloc_orDie(line_size + 1); // +1 for '\n'
-    for (int i = 0; i < num_lines; i++) {
-        for (int j = 0; j < line_size; j++) {
-            line[j] = random_printable_char();
+    char *line = malloc_orDie(line_size);
+    for (int i = 0; i < num_lines; i++)
+    {
+        int idx = itoa(i, line);
+        printf("%d\n", idx);
+        for (int j = idx; j < line_size - 1; j++)
+        {
+            line[j] = random_alphabetic_char();
         }
-        line[line_size] = '\n';
-        fwrite_orDie(line, line_size + 1, out);
+        line[line_size - 1] = 0;
+        fwrite_orDie(line, line_size, out);
     }
 
     free(line);

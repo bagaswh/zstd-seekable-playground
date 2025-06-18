@@ -4,6 +4,11 @@
 CC = clang
 CFLAGS = -Wall -Wextra -pedantic -Werror -O2 -std=c17 -march=native
 DEBUG_CFLAGS = -Wall -Wextra -g -DDEBUG -std=c99
+ASAN_CFLAGS = -Wall -Wextra -g -DDEBUG -std=c99 -fsanitize=address -fno-omit-frame-pointer
+
+# Linker flags
+LDFLAGS = 
+ASAN_LDFLAGS = -fsanitize=address
 
 # Project structure
 BUILD_DIR = build
@@ -46,11 +51,23 @@ $(ZSTD_SEEKABLE_DIR)/%.o: $(ZSTD_SEEKABLE_DIR)/%.c
 # Build main target
 $(TARGET): $(BUILD_DIR) $(ZSTD_LIB) $(ZSTD_SEEKABLE_OBJS) $(SOURCES)
 	@echo "Building CLI binary..."
-	$(CC) $(CFLAGS) $(INCLUDES) $(SOURCES) $(ZSTD_SEEKABLE_OBJS) $(ZSTD_LIB) $(SOURCE_FILES) -o $(TARGET)
+	$(CC) $(CFLAGS) $(INCLUDES) $(SOURCES) $(ZSTD_SEEKABLE_OBJS) $(ZSTD_LIB) $(SOURCE_FILES) $(LDFLAGS) -o $(TARGET)
 
 # Debug build
 debug: CFLAGS = $(DEBUG_CFLAGS)
 debug: all
+
+# ASan build
+asan: CFLAGS = $(ASAN_CFLAGS)
+asan: LDFLAGS = $(ASAN_LDFLAGS)
+asan: TARGET = $(BUILD_DIR)/cli-asan
+asan: clean-objs $(TARGET)
+	@echo "Built with AddressSanitizer: $(TARGET)"
+
+# Clean only object files (preserves zstd lib)
+clean-objs:
+	@echo "Cleaning object files..."
+	find $(ZSTD_SEEKABLE_DIR) -name '*.o' -delete
 
 # Clean build artifacts
 clean:
@@ -71,5 +88,9 @@ init-submodules:
 run: all
 	$(TARGET)
 
+# Run with ASan
+run-asan: asan
+	$(BUILD_DIR)/cli-asan
+
 # Phony targets
-.PHONY: all debug clean clean-all init-submodules run
+.PHONY: all debug asan clean clean-objs clean-all init-submodules run run-asan
