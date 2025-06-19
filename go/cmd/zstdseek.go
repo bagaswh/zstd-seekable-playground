@@ -8,6 +8,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	seekable "github.com/SaveTheRbtz/zstd-seekable-format-go/pkg"
 	"github.com/klauspost/compress/zstd"
@@ -74,35 +76,36 @@ func compress(ctx context.Context, inputFile, outputFile, compressionLevel strin
 	if err != nil {
 		log.Fatalf("failed to create zstd encoder: %s", err)
 	}
+	defer seekableWriter.Close()
 
 	readBufSize := max(frameSize, 10*1024*1024)
 	buf := make([]byte, readBufSize)
 	total := 0
 	for {
-		n, err := r.Read(buf)
-		start := 0
-		for start < n {
-			upto := min(frameSize, n-start)
-			written, err := seekableWriter.Write(buf[start : start+upto])
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			n, err := r.Read(buf)
+			start := 0
+			for start < n {
+				upto := min(frameSize, n-start)
+				written, err := seekableWriter.Write(buf[start : start+upto])
+				if err != nil {
+					log.Fatal(err)
+				}
+				start += upto
+				total += written
+			}
 			if err != nil {
+				if err == io.EOF {
+					return
+				}
 				log.Fatal(err)
 			}
-			start += upto
-			total += written
-		}
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			log.Fatal(err)
 		}
 	}
-	fmt.Println(total)
 
-	err = seekableWriter.Close()
-	if err != nil {
-		log.Fatalf("failed flushing seektable: %v\n", err)
-	}
 }
 
 type seekTableFooter struct {
@@ -227,10 +230,20 @@ func main() {
 	flag.IntVar(&decompressionThreads, "dt", 1, "Decompression threads")
 	flag.Parse()
 
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+	go func() {
+		<-ctx.Done()
+		cancel()
+		return
+	}()
+
 	exeName := os.Args[0]
 	if exeName == "zstdseekcat" || doDecompress {
-		decompress(context.TODO(), inputFile, outputFile, decompressionThreads)
+		decompress(ctx, inputFile, outputFile, decompressionThreads)
 	} else {
-		compress(context.TODO(), inputFile, outputFile, compressionLevel, frameSize)
+		compress(ctx, inputFile, outputFile, compressionLevel, frameSize)
 	}
+
+	cancel()
 }
