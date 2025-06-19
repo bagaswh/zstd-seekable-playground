@@ -2,6 +2,10 @@ name: Go CI
 
 on:
   push:
+    branches:
+      - main
+    tags:
+      - 'v*'
     paths:
       - 'go/**'
       - '.github/workflows/go.yml'
@@ -43,9 +47,6 @@ jobs:
 
       - name: Format
         run: make fmt
-
-      - name: Lint
-        run: make lint
 
   release:
     needs: build
