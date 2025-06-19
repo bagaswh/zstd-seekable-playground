@@ -33,6 +33,15 @@ size_t fwrite_orDie(const void* buffer, size_t sizeToWrite, FILE* file)
     exit(ERROR_fwrite);
 }
 
+int fflush_orDie(FILE *file)
+{
+    int const ret = fflush(file);
+    if (ret == 0) return 0;
+    /* error */
+    perror("fflush");
+    exit(ERROR_fflush);
+}
+
 void *malloc_orDie(size_t size)
 {
     void *const buff = malloc(size);

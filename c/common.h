@@ -14,6 +14,7 @@ typedef enum
     ERROR_saveFile = 7,
     ERROR_malloc = 8,
     ERROR_largeFile = 9,
+    ERROR_fflush = 10,
 } COMMON_ErrorCode;
 
 #define CHECK(cond, ...)                        \
@@ -39,6 +40,7 @@ typedef enum
 FILE* fopen_orDie(const char *filename, const char *instruction);
 size_t fread_orDie(void *buffer, size_t sizeToRead, FILE *file);
 size_t fwrite_orDie(const void* buffer, size_t sizeToWrite, FILE* file);
+int fflush_orDie(FILE* file);
 void *malloc_orDie(size_t size);
 
 #endif // __COMMON_H

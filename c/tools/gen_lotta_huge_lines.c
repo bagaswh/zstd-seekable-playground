@@ -10,16 +10,10 @@
 #define ASCII_MIN 65
 #define ASCII_MAX 90
 
-// static char random_word()
-// {
-//     int index = rand() % word_pool_size;
-//     return word_pool[index];
-// }
-
 char random_alphabetic_char(void)
 {
-    // int index = rand() % 26;
-    return 'A';
+    int index = rand() % 26;
+    return 'A'+index;
 }
 
 void reverse(char s[])
@@ -84,14 +78,14 @@ int main(int argc, char **argv)
     for (int i = 0; i < num_lines; i++)
     {
         int idx = itoa(i, line);
-        printf("%d\n", idx);
         for (int j = idx; j < line_size - 1; j++)
         {
             line[j] = random_alphabetic_char();
         }
-        line[line_size - 1] = 0;
+        line[line_size - 1] = '\n';
         fwrite_orDie(line, line_size, out);
     }
+    fflush_orDie(out);
 
     free(line);
     fclose(out);

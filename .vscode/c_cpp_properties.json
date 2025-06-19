@@ -3,10 +3,10 @@
     {
       "name": "Linux",
       "includePath": [
-        "${workspaceFolder}/**",
-        "${workspaceFolder}/external/zstd/lib",
-        "${workspaceFolder}/external/zstd/lib/common",
-        "${workspaceFolder}/external/zstd/contrib/seekable_format",
+        "${workspaceFolder}/c/**",
+        "${workspaceFolder}/c/external/zstd/lib",
+        "${workspaceFolder}/c/external/zstd/lib/common",
+        "${workspaceFolder}/c/external/zstd/contrib/seekable_format",
         "/usr/lib/gcc/x86_64-linux-gnu/**/include",
         "/usr/include/x86_64-linux-gnu",
         "/usr/include",
